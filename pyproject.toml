@@ -15,6 +15,7 @@ dependencies = [
     "pandas",
     "pyarrow",
     "docstring_parser",
+    "huggingface_hub",
 ]
 
 requires-python = ">= 3.9"
