@@ -68,4 +68,5 @@ classifiers = [
 [tool.setuptools]
 py-modules = ["naughtyLLM"]
 
-    
+[project.optional-dependencies]
+dev = ["pytest",]
