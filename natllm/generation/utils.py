@@ -23,8 +23,13 @@ class Generator:
 
 
 class RegexGenerator(Generator):
-    def __init__(self, model, tokenizer, regex: str) -> None:
-        self.validator = RegexValidator(regex)
+    def __init__(self, model, tokenizer, regex: str = None) -> None:
+        """
+        if regex is None, then no validation will be performed
+        """
+        self.validator = None
+        if regex is not None:
+            self.validator = RegexValidator(regex)
 
     def generate(
         self,
