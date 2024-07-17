@@ -5,7 +5,24 @@ from transformers.generation.utils import GenerateDecoderOnlyOutput
 from validation import RegexValidator
 
 
-class RegexGenerator:
+class Generator:
+    def __init__(self, model, tokenizer) -> None:
+        self.model = model
+        self.tokenizer = tokenizer
+    
+    def generate(
+        self,
+        inputs: Optional[torch.Tensor] = None,
+        max_new_tokens=None,
+        do_sample=True,
+        top_k=None,
+        top_p=None,
+        temperature=None,
+    ) -> Union[GenerateDecoderOnlyOutput, torch.LongTensor]:
+        raise NotImplementedError
+
+
+class RegexGenerator(Generator):
     def __init__(self, model, tokenizer, regex: str) -> None:
         self.validator = RegexValidator(regex)
 
