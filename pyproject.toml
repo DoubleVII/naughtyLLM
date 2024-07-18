@@ -16,6 +16,7 @@ dependencies = [
     "pyarrow",
     "docstring_parser",
     "huggingface_hub",
+    "interegular",
 ]
 
 requires-python = ">= 3.9"
@@ -69,4 +70,4 @@ classifiers = [
 py-modules = ["naughtyLLM"]
 
 [project.optional-dependencies]
-dev = ["pytest",]
+dev = ["pytest", "protobuf"] # our test tiny model llama-68m requires protobuf
