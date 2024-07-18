@@ -2,7 +2,7 @@ from typing import Optional, Union
 import torch
 from transformers.generation.utils import GenerateDecoderOnlyOutput
 
-from validation import RegexValidator
+from natllm.validation import RegexValidator
 
 
 class Generator:
