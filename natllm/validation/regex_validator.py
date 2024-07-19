@@ -1,5 +1,5 @@
-import interegular
 
+import interegular
 
 class Validator:
     def __init__(self) -> None:
@@ -11,40 +11,57 @@ class Validator:
     def validate(self, input_str: str) -> bool:
         raise NotImplementedError
 
-    def finish(self) -> bool:  # <eos>
+    def finish(self) -> bool:
         raise NotImplementedError
 
 
 class RegexValidator(Validator):
-    #  regex 参数是一个正则表达式字符串。
     def __init__(self, regex: str) -> None:
         super().__init__()
-        # 解析正则表达式模式并将其转换为FSM（有限状态自动机）对象
         self.fsm = interegular.parse_pattern(regex).to_fsm()
-        #  初始化当前状态为 None，表示还未开始验证过程
+        print(self.fsm)
+
+        # 显示了fsm的状态转移字典
+        # map: Dict[State, Dict[TransitionKey, State]]
+        # 这是一个嵌套字典，其中外层字典的键是状态，值是另一个字典。内层字典的键是过渡符号或条件，值是目标状态
+        print(self.fsm.map)
+
+        # 显示了每个符号对应的 TransitionKey,
+        # 每个符号会映射到一个特定的 TransitionKey， 此TransitionKey 可用于在状态转移字典map中查找对应的目标状态
+        print(self.fsm.alphabet)
+
+        # print(self.fsm.initial)
+        # print(self.fsm.states)
+        # print(self.fsm.finals)
         self.current_state = None
 
-    # 初始化状态为 FSM 的初始状态
     def init_state(self) -> None:
-        self.current_state = self.fsm.start_state
-
-    # 验证输入字符串是否使 FSM 转移到一个有效状态
-    def validate(self, input_str: str) -> bool:
-        # 遍历输入字符串 input_str 中的每个字符char，检查它是否在当前状态self.current_state的转移字典中
-        for char in input_str:
-            # 如果是，则更新self.current_state到下一个状态，即self.fsm.transitions[self.current_state][char]
-            if char in self.fsm.transitions[self.current_state]:
-                self.current_state = self.fsm.transitions[self.current_state][char]
-            # 如果不是，则表示当前字符在当前状态下无法继续转移，返回False表示验证失败
-            else:
-                return False
-
-        # 检查当前状态是否为最终状态
-        if self.current_state in self.fsm.final_states:
-            return True
+        if hasattr(self.fsm, 'initial'):
+            self.current_state = self.fsm.initial
         else:
-            return False
+            raise AttributeError("FSM 对象没有 initial 属性作为起始状态")
 
-    # 确认整个验证过程结束时，当前状态是否是最终状态
-    def finish(self) -> bool:  # <eos>
-        return self.current_state in self.fsm.final_states
+    def validate(self, input_str: str) -> bool:
+        print(f"Validating input: {input_str}")
+        self.current_state = self.fsm.initial
+        for char in input_str:
+            # 获取当前字符的 TransitionKey
+            # 如果 char 在 self.fsm.alphabet 中，获取其转移键
+            if char in self.fsm.alphabet:
+                transition_key = self.fsm.alphabet[char]
+            # 如果 char 不在字母表中，则使用 anything_else 的转移键
+            else:
+                # 处理 anything_else 的情况
+                transition_key = self.fsm.alphabet.get("anything_else", None)
+
+            # print(transition_key)
+
+            if self.current_state in self.fsm.map and transition_key in self.fsm.map[self.current_state]:
+                self.current_state = self.fsm.map[self.current_state][transition_key]
+            else:
+                print(f"Character '{char}' not in FSM transitions for state {self.current_state}")
+                return False
+        return self.current_state in self.fsm.finals
+
+    def finish(self) -> bool:
+        return self.current_state in self.fsm.finals
