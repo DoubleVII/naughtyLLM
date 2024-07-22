@@ -30,11 +30,11 @@ class RegexValidator(Validator):
         # 每个符号会映射到一个特定的 TransitionKey， 此TransitionKey 可用于在状态转移字典map中查找对应的目标状态
         print(self.fsm.alphabet)
 
+        self.current_state = None
+        self.last_state = None
         # print(self.fsm.initial)
         # print(self.fsm.states)
         # print(self.fsm.finals)
-        self.current_state = None
-        self.last_state = None
 
     def init_state(self) -> None:
         if hasattr(self.fsm, 'initial'):
