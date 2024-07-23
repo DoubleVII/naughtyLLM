@@ -58,7 +58,6 @@ class RegexValidator(Validator):
                 # 处理 anything_else 的情况
                 transition_key = self.fsm.alphabet.get("anything_else", None)
 
-            # print(transition_key)
             print(f"Current state: {self.current_state}, Character: {char}, Transition key: {transition_key}")
 
             # 若当前状态是状态转移表中的一个状态；
