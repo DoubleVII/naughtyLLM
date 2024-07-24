@@ -1,6 +1,7 @@
 from typing import Optional, Union
 import torch
 from transformers.generation.utils import GenerateDecoderOnlyOutput
+from transformers.modeling_outputs import CausalLMOutputWithPast
 
 from natllm.validation import RegexValidator
 
@@ -39,18 +40,37 @@ class RegexGenerator(Generator):
         do_sample=True,
         top_k=None,
         top_p=None,
-        temperature=None,
+        temperature: float = 1,
     ) -> Union[GenerateDecoderOnlyOutput, torch.LongTensor]:
-        # 由于validation需要输入字符串，因此需要tokenizer
 
-        self.validator.init_state()
+        assert inputs is not None and inputs.size(0) == 1, "Batch size must be 1"
+
+        # 由于validation需要输入字符串，因此需要tokenizer
+        if self.validator is not None:
+            self.validator.init_state()
+        past_key_values = None
 
         # do generation
         for step in range(max_new_tokens):
-            with torch.no_grad():
-                output = self.model(inputs)
+            if past_key_values is not None:
+                pruned_input_ids = inputs[:, past_key_values[0][0].size(2) :]
+            else:
+                pruned_input_ids = inputs
 
-            step_logits: torch.Tensor =torch.softmax(output.logits[0,-1], dim=0)
+            output: CausalLMOutputWithPast = self.model(
+                input_ids=pruned_input_ids,
+                use_cache=True,
+                past_key_values=past_key_values,
+                return_dict=True,
+                output_attentions=False,
+                output_hidden_states=False,
+            )
+            logits = output.logits
+            past_key_values = output.past_key_values
+            if temperature != 0:
+                logits = logits/temperature
+
+            step_logits: torch.Tensor =torch.softmax(logits[0,-1], dim=0)
 
             while True:
                 if top_k is not None and do_sample:
@@ -74,7 +94,7 @@ class RegexGenerator(Generator):
                     # 根据新的概率分布进行采样
                     selected_index = torch.multinomial(step_logits, 1).squeeze()
 
-                elif not do_sample:
+                elif not do_sample or temperature == 0:
                     cand_probs, cand_index = step_logits.topk(dim=0, k=1)
                     selected_index = cand_index.squeeze()
 
@@ -89,8 +109,21 @@ class RegexGenerator(Generator):
                 elif self.validator.validate(self.tokenizer.decode(step_output)):
                     break
                 step_logits[step_output] = 0
+
             inputs = torch.cat([inputs, step_output[None,None]], dim=1)
 
             if step_output == self.tokenizer.eos_token_id:
-                return inputs.long()
-        return inputs.long()
+                return GenerateDecoderOnlyOutput(
+                    sequences=inputs,
+                    past_key_values=past_key_values,
+                    attentions=None,
+                    hidden_states=None,
+                    scores=None
+                )
+        return GenerateDecoderOnlyOutput(
+                    sequences=inputs,
+                    past_key_values=past_key_values,
+                    attentions=None,
+                    hidden_states=None,
+                    scores=None
+                )
