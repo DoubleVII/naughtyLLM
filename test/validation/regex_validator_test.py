@@ -66,3 +66,21 @@ def test_regexValidator_recover():
     assert validator.validate(test_tokens[3])
 
     assert validator.finish()
+
+def test_regexValidator_recover2():
+    regex = r"\d+\+\d+=\d+"
+
+    test_tokens = ["32", "+", "7", "-","=","42"]
+    validator = RegexValidator(regex)
+
+    validator.init_state()
+
+    assert validator.validate(test_tokens[0])
+    assert validator.validate(test_tokens[1])
+    assert validator.validate(test_tokens[2])
+    assert not validator.validate(test_tokens[3])
+    assert validator.validate(test_tokens[4])
+    assert validator.validate(test_tokens[5])
+
+    assert validator.finish()
+

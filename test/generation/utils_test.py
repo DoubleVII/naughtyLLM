@@ -2,6 +2,7 @@ import pytest
 from transformers import AutoModelForCausalLM, AutoTokenizer, AutoConfig
 import torch
 from natllm.generation.utils import RegexGenerator
+import re
 
 
 @pytest.fixture(scope="module")
@@ -46,3 +47,25 @@ def test_basic_generation(tokenizer, model):
     ]
 
     assert ref_generated_ids == generated_ids
+
+
+def test_regex_generation(tokenizer, model):
+
+    regex = r"\d+\+\d+=\d+"
+
+    regex_generator = RegexGenerator(model, tokenizer, regex)
+
+    text = "compute the following math problem: 23+4="
+    model_inputs = tokenizer([text], return_tensors="pt").to("cpu")
+
+    generated_ids = regex_generator.generate(model_inputs.input_ids, max_new_tokens=20, do_sample=False)
+
+    generated_ids = [
+        output_ids[len(input_ids) :]
+        for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
+    ]
+
+    generated_texts = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)
+
+    for text in generated_texts:
+        assert re.match(regex, text), f"Generated text does not match the regex. Text: {text}"
