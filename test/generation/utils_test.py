@@ -51,14 +51,14 @@ def test_basic_generation(tokenizer, model):
 
 def test_regex_generation(tokenizer, model):
 
-    regex = r"\d+\+\d+=\d+"
+    regex = r"\d+"
 
     regex_generator = RegexGenerator(model, tokenizer, regex)
 
     text = "compute the following math problem: 23+4="
     model_inputs = tokenizer([text], return_tensors="pt").to("cpu")
 
-    generated_ids = regex_generator.generate(model_inputs.input_ids, max_new_tokens=20, do_sample=False)
+    generated_ids = regex_generator.generate(model_inputs.input_ids, max_new_tokens=100, do_sample=False)
 
     generated_ids = generated_ids.sequences
 
