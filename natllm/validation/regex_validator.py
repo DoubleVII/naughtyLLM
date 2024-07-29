@@ -33,8 +33,8 @@ class RegexValidator(Validator):
         self.current_state = None
         self.last_state = None
         # print(self.fsm.initial)
-        # print(self.fsm.states)
         # print(self.fsm.finals)
+        # print(self.fsm.states)
 
     def init_state(self) -> None:
         if hasattr(self.fsm, 'initial'):
