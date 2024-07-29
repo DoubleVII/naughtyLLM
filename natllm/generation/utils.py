@@ -57,14 +57,15 @@ class RegexGenerator(Generator):
             else:
                 pruned_input_ids = inputs
 
-            output: CausalLMOutputWithPast = self.model(
-                input_ids=pruned_input_ids,
-                use_cache=True,
-                past_key_values=past_key_values,
-                return_dict=True,
-                output_attentions=False,
-                output_hidden_states=False,
-            )
+            with torch.no_grad():
+                output: CausalLMOutputWithPast = self.model(
+                    input_ids=pruned_input_ids,
+                    use_cache=True,
+                    past_key_values=past_key_values,
+                    return_dict=True,
+                    output_attentions=False,
+                    output_hidden_states=False,
+                )
             logits = output.logits
             past_key_values = output.past_key_values
             if temperature != 0:
