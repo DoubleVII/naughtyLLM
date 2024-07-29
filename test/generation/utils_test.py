@@ -43,10 +43,10 @@ def test_basic_generation(tokenizer, model):
 
     generated_ids = [
         output_ids[len(input_ids) :]
-        for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
+        for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids.sequences)
     ]
 
-    assert ref_generated_ids == generated_ids
+    assert torch.all(ref_generated_ids[0] == generated_ids[0])
 
 
 def test_regex_generation(tokenizer, model):
