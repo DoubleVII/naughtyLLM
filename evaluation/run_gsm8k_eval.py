@@ -24,7 +24,7 @@ Q: Olivia has $23. She bought five bagels for $3 each. How much money does she h
 Q: {}\nA:"""
 
 
-guidance_regex = r"[\w\d\.\*\-=\+,\?/]{50,700}\. The answer is (\-?[0-9,]+)\."
+guidance_regex = r"[\w\d\.\*\-=\+,\?/ ]{50,700}\. The answer is (\-?[0-9,]+)\."
 
 
 
