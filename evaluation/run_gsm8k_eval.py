@@ -29,6 +29,7 @@ guidance_regex = r"[\w\d\.\*\-=\+,\?/]{50,700}\. The answer is (\-?[0-9,]+)\."
 
 
 def parse_answer(output:str) -> Optional[int]:
+    output = output.split("\n")[0] # remove extra lines
     answer_regex = r"The answer is (\-?[0-9,]+)\."
     match = re.search(answer_regex, output)
     if match is not None:
