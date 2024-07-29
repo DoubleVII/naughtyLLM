@@ -1,3 +1,4 @@
+import unittest
 class number_FSM:
     def __init__(self):
         # 定义状态
@@ -10,21 +11,24 @@ class number_FSM:
         
         # 定义状态转移表
         self.transitions = {
-            'START': {'-': 'SIGNED', 'digit': 'INTEGER_PART'},
-            'SIGNED': {'digit': 'INTEGER_PART'},
-            'INTEGER_PART': {'digit': 'INTEGER_PART', '.': 'DOT', 'e': 'EXP', 'E': 'EXP'},
-            'DOT': {'digit': 'FRACTION_PART'},
-            'FRACTION_PART': {'digit': 'FRACTION_PART', 'e': 'EXP', 'E': 'EXP'},
+            'START': {'-': 'SIGNED', '0': 'LEADING_ZERO', 'digit': 'INTEGER_PART'},
+            'SIGNED': {'0': 'LEADING_ZERO', 'digit': 'INTEGER_PART'},
+            'LEADING_ZERO': {'0': 'REJECT', 'digit': 'REJECT', '.': 'DOT', 'e': 'REJECT', 'E': 'REJECT'},
+            'INTEGER_PART': {'0': 'INTEGER_PART', 'digit': 'INTEGER_PART', '.': 'DOT', 'e': 'EXP', 'E': 'EXP'},
+            'DOT': {'0': 'FRACTION_PART', 'digit': 'FRACTION_PART'},
+            'FRACTION_PART': {'0': 'FRACTION_PART', 'digit': 'FRACTION_PART', 'e': 'EXP', 'E': 'EXP'},
             'EXP': {'+': 'EXP_SIGN', '-': 'EXP_SIGN', 'digit': 'EXP_NUMBER'},
-            'EXP_SIGN': {'digit': 'EXP_NUMBER'},
-            'EXP_NUMBER': {'digit': 'EXP_NUMBER'}
+            'EXP_SIGN': {'0': 'EXP_NUMBER', 'digit': 'EXP_NUMBER'},
+            'EXP_NUMBER': {'0': 'EXP_NUMBER', 'digit': 'EXP_NUMBER'}
         }
     
     def is_digit(self, char):
         return char.isdigit()
     
     def get_char_type(self, char):
-        if self.is_digit(char):
+        if char == '0':
+            return char
+        elif self.is_digit(char):
             return 'digit'
         elif char in '-+.eE':
             return char
@@ -55,11 +59,45 @@ class number_FSM:
         return self.is_accepting()
 
 
-if __name__ == '__main__':
-    # 测试
-    fsm = number_FSM()
-    test_cases = ["123", "-123", "123.45", "-123.45", "1e10", "-1.23e-4", "abc", "123e", "1.2.3", "1e10e10"]
+class TestNumberFSM(unittest.TestCase):
+    def setUp(self):
+        self.fsm = number_FSM()
 
-    for test in test_cases:
-        result = fsm.match(test)
-        print(f"'{test}': {result}")
+    def test_valid_numbers(self):
+        test_cases = ["123",
+                      "-123",
+                      "123.45",
+                      "-123.45",
+                      "0.123",
+                      "1e10",
+                      "12.3e4",
+                      "-1.23e4",
+                      "-1.23e-4"]
+        for test in test_cases:
+            with self.subTest(test=test):
+                self.assertTrue(self.fsm.match(test), f"Failed for {test}")
+
+    def test_invalid_numbers(self):
+        test_cases = ["abc",  #not digit
+                      "123e",  #no digit after e
+                      ".123"  #no digit before dot
+                      "1.2.3",  #mutiple dots
+                      "1e10e10",  #multiple es
+                      "123e4.5",  #dot after e
+                      "0123",  #leading zero
+                      "00.123",  #leading zeros
+                      "0e10"]  #leading zero with e
+        for test in test_cases:
+            with self.subTest(test=test):
+                self.assertFalse(self.fsm.match(test), f"Failed for {test}")
+
+if __name__ == '__main__':
+    # test cases
+    unittest.main()
+    # fsm = number_FSM()
+    # test_cases = ["123", "-123", "123.45", "-123.45", "1e10",
+    # "-1.23e-4", "abc", "123e", "1.2.3", "1e10e10"]
+
+    # for test in test_cases:
+    #     result = fsm.match(test)
+    #     print(f"'{test}': {result}")
