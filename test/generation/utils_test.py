@@ -60,6 +60,8 @@ def test_regex_generation(tokenizer, model):
 
     generated_ids = regex_generator.generate(model_inputs.input_ids, max_new_tokens=20, do_sample=False)
 
+    generated_ids = generated_ids.sequences
+
     generated_ids = [
         output_ids[len(input_ids) :]
         for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
