@@ -28,16 +28,30 @@ guidance_regex = r"[\w\d\.\*\-=\+,\?/ ]{50,700}\. The answer is (\-?[0-9,]+)\."
 
 
 
-def parse_answer(output:str) -> Optional[int]:
-    output = output.split("\n")[0] # remove extra lines
-    answer_regex = r"The answer is (\-?[0-9,]+)\."
-    match = re.search(answer_regex, output)
-    if match is not None:
-        # Extract the first group, remove commas and convert to int
-        number_str = match.group(1).replace(',', '')
-        return int(number_str)
-    else:
+# def parse_answer(output:str) -> Optional[int]:
+#     output = output.split("\n")[0] # remove extra lines
+#     answer_regex = r"The answer is (\-?[0-9,]+)\."
+#     match = re.search(answer_regex, output)
+#     if match is not None:
+#         # Extract the first group, remove commas and convert to int
+#         number_str = match.group(1).replace(',', '')
+#         return int(number_str)
+#     else:
+#         return None
+
+
+def parse_answer(output: str) -> Optional[int]:
+    import json
+    from typing import Optional
+    try:
+        # 尝试将输出解析为 JSON
+        out = json.loads(output)
+        # 提取 'answer' 字段
+        return out.get("response", {}).get("answer")
+    except json.JSONDecodeError:
+        # 如果 JSON 解析失败，返回 None
         return None
+
 
 def load_data(data_path: str) -> List[Dict]:
     assert data_path.endswith(".parquet"), "data_path must be a parquet file"
