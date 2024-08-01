@@ -6,7 +6,7 @@ from run_gsm8k_eval import parse_answer  # 根据实际模块路径导入 parse_
 def test_parse_answer_valid_json():
     output = '''
     {
-        "question": "There are 15 trees in the grove.",
+        "question": "There are 15 trees in the grove.Grove workers will plant trees in the grove today.After they are done, there will be 21 trees.How many trees did the grove workers plant today?",
         "response": {
             "reasoning": "There are 15 trees originally. Then there were 21 trees after some more were planted. So there must have been 21 - 15 = 6.",
             "answer": 6
@@ -21,9 +21,9 @@ def test_parse_answer_valid_json():
 def test_parse_answer_missing_answer():
     output = '''
     {
-        "question": "How many trees did the grove workers plant today?",
+        "question": "There are 15 trees in the grove.Grove workers will plant trees in the grove today.After they are done, there will be 21 trees.How many trees did the grove workers plant today?",
         "response": {
-            "reasoning": "There are 15 trees originally. Then there were 21 trees after some more were planted. So there must have been 21 - 15."
+            "reasoning": "There are 15 trees originally. Then there were 21 trees after some more were planted. So there must have been 21 - 15 = 6.",
         }
     }
     '''
@@ -34,7 +34,7 @@ def test_parse_answer_missing_answer():
 def test_parse_answer_invalid_json():
     output = '''
     {
-        "question": "How many trees did the grove workers plant today?",
+        "question": "There are 15 trees in the grove.Grove workers will plant trees in the grove today.After they are done, there will be 21 trees.How many trees did the grove workers plant today?",
         "response": {
             "reasoning": "There are 15 trees originally. Then there were 21 trees after some more were planted. So there must have been 21 - 15 = 6.",
             "answer": 6
