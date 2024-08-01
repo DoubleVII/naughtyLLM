@@ -23,7 +23,7 @@ def test_parse_answer_missing_answer():
     {
         "question": "There are 15 trees in the grove.Grove workers will plant trees in the grove today.After they are done, there will be 21 trees.How many trees did the grove workers plant today?",
         "response": {
-            "reasoning": "There are 15 trees originally. Then there were 21 trees after some more were planted. So there must have been 21 - 15 = 6.",
+            "reasoning": "There are 15 trees originally. Then there were 21 trees after some more were planted. So there must have been 21 - 15 = 6."
         }
     }
     '''
