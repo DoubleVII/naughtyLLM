@@ -28,29 +28,29 @@ guidance_regex = r"[\w\d\.\*\-=\+,\?/ ]{50,700}\. The answer is (\-?[0-9,]+)\."
 
 
 
-# def parse_answer(output:str) -> Optional[int]:
-#     output = output.split("\n")[0] # remove extra lines
-#     answer_regex = r"The answer is (\-?[0-9,]+)\."
-#     match = re.search(answer_regex, output)
-#     if match is not None:
-#         # Extract the first group, remove commas and convert to int
-#         number_str = match.group(1).replace(',', '')
-#         return int(number_str)
-#     else:
-#         return None
-
-
-def parse_answer(output: str) -> Optional[int]:
-    import json
-    from typing import Optional
-    try:
-        # 尝试将输出解析为 JSON
-        out = json.loads(output)
-        # 提取 'answer' 字段
-        return out.get("response", {}).get("answer")
-    except json.JSONDecodeError:
-        # 如果 JSON 解析失败，返回 None
+def parse_answer(output:str) -> Optional[int]:
+    output = output.split("\n")[0] # remove extra lines
+    answer_regex = r"The answer is (\-?[0-9,]+)\."
+    match = re.search(answer_regex, output)
+    if match is not None:
+        # Extract the first group, remove commas and convert to int
+        number_str = match.group(1).replace(',', '')
+        return int(number_str)
+    else:
         return None
+
+
+# def parse_answer(output: str) -> Optional[int]:
+#     import json
+#     from typing import Optional
+#     try:
+#         # 尝试将输出解析为 JSON
+#         out = json.loads(output)
+#         # 提取 'answer' 字段
+#         return out.get("response", {}).get("answer")
+#     except json.JSONDecodeError:
+#         # 如果 JSON 解析失败，返回 None
+#         return None
 
 
 def load_data(data_path: str) -> List[Dict]:
@@ -98,7 +98,7 @@ def run(model: str, data_path: str, max_new_tokens:int = 200, use_regex:bool = T
 
         generated_ids = [
             output_ids[len(input_ids) :]
-            for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
+            for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids.sequences)
         ]
         generated_text = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
         generated_answer = parse_answer(generated_text)
