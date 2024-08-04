@@ -1,5 +1,5 @@
-from number_FSM import number_FSM
-from regex_validator import Validator
+from natllm.validation.number_FSM import number_FSM
+from natllm.validation.regex_validator import Validator
 
 EOS = '<EOS>' # 指代模型输出的结尾
 PlaceHolder = 'General Exception' # 异常占位符
