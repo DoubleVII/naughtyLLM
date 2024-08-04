@@ -105,8 +105,12 @@ class RegexGenerator(Generator):
                 step_output: int = selected_index  # 根据不同sampling方法得到
 
                 if step_output == self.tokenizer.eos_token_id:
-                    if self.validator.finish():
+                    if self.validator is None:
                         break
+                    elif self.validator.finish():
+                        break
+                elif self.validator is None:
+                    break
                 elif self.validator.validate(self.tokenizer.decode(step_output)):
                     break
                 step_logits[step_output] = 0
