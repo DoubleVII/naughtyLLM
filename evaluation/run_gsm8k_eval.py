@@ -87,11 +87,20 @@ def parse_answer_regex(output: str) -> Optional[int]:
         return None
 
 
+def truncate_json(s):
+    first_brace = s.find('}')
+    if first_brace == -1:
+        raise ValueError
+    second_brace = s.find('}', first_brace + 1)
+    if second_brace == -1:
+        raise ValueError
+    return s[:second_brace + 1]  # return part of the string up to and including the second '}'
+
+
 def parse_answer_json(output: str) -> Optional[int]:
     import json
-    from typing import Optional
-
     try:
+        output = truncate_json(output)
         # 尝试将输出解析为 JSON
         out = json.loads(output)
         # 提取 'answer' 字段
