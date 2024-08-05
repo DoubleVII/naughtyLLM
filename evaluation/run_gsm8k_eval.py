@@ -192,7 +192,7 @@ def run(
         if prompt_type == "text":
             input_text = prompt.format(question_text)
         else:
-            question_text.replace("\"", "'")
+            question_text = question_text.replace("\"", "'")
             sample_json_head = json_head.format(question_text)
             input_text = prompt + "\n\n" + sample_json_head
 
