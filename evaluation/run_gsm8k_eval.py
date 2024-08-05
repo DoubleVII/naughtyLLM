@@ -194,7 +194,7 @@ def run(
             input_text = prompt + "\n\n" + sample_json_head
 
         model_inputs = tokenizer([input_text], return_tensors="pt").to("cuda")
-        if prompt_type == "text":
+        if prompt_type == "text" or (not use_constraint):
             generated_ids = generator.generate(
                 model_inputs.input_ids, max_new_tokens=max_new_tokens, do_sample=False
             )
