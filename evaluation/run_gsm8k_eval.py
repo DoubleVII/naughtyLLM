@@ -108,6 +108,8 @@ def parse_answer_json(output: str) -> Optional[int]:
     except json.JSONDecodeError:
         # 如果 JSON 解析失败，返回 None
         return None
+    except ValueError:
+        return None
 
 
 def load_data(data_path: str) -> List[Dict]:
