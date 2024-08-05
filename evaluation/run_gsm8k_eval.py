@@ -199,7 +199,7 @@ def run(
                 model_inputs.input_ids, max_new_tokens=max_new_tokens, do_sample=False
             )
         else:
-            assert isinstance(generated_ids, JsonGenerator)
+            assert isinstance(generator, JsonGenerator)
             generated_ids = generator.generate(
                 model_inputs.input_ids, max_new_tokens=max_new_tokens, do_sample=False, json_head=sample_json_head
             )
