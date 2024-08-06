@@ -68,11 +68,11 @@ json_demonstration = """{{
 
 json_head = """{{
   "question": "{}",
-  "response": {{
-    "reasoning":"""
+  """
 
 
 guidance_regex = r"[\w\d\.\*\-=\+,\?/ ]{50,700}\. The answer is (\-?[0-9,]+)\."
+json_guidance_regex = r'"response": \{\s*"reasoning": "([\w\d\.\*\-=\+,\?/ ]{50,700})",\s*"answer": (\-?[0-9]+)\n  \}\n\}'
 
 
 def parse_answer_regex(output: str) -> Optional[int]:
@@ -168,13 +168,16 @@ def run(
     test_data = load_data(data_path)
     model, tokenizer = load_model_and_tokenizer(model)
 
-    assert prompt_type in ["text", "json"]
+    assert prompt_type in ["text", "json", "json_regex"]
 
     if use_constraint:
         if prompt_type == "text":
             generator = RegexGenerator(model, tokenizer, regex=guidance_regex)
         elif prompt_type == "json":
             generator = JsonGenerator(model, tokenizer)
+        elif prompt_type == "json_regex":
+            generator = RegexGenerator(model, tokenizer, regex=json_guidance_regex)
+
     else:
         generator = RegexGenerator(model, tokenizer, regex=None)
 
@@ -197,7 +200,7 @@ def run(
             input_text = prompt + "\n\n" + sample_json_head
 
         model_inputs = tokenizer([input_text], return_tensors="pt").to("cuda")
-        if prompt_type == "text" or (not use_constraint):
+        if prompt_type in ("text", "json_regex") or (not use_constraint):
             generated_ids = generator.generate(
                 model_inputs.input_ids, max_new_tokens=max_new_tokens, do_sample=False
             )
