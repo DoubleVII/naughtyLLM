@@ -221,7 +221,7 @@ def run(
         )[0]
         if prompt_type == "text":
             generated_answer = parse_answer_regex(generated_text)
-        elif prompt_type == "json":
+        else:
             generated_answer = parse_answer_json(sample_json_head + generated_text)
 
         if generated_answer is not None:
