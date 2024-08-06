@@ -148,7 +148,7 @@ def load_prompt(shot: int, prompt_type: str) -> str:
         text_prompt.append("Q: {}\nA:")
         text_prompt = "\n\n\n".join(text_prompt)
         return text_prompt
-    elif prompt_type == "json":
+    else:
         json_prompt = [
             json_demonstration.format(*demonstration)
             for demonstration in demonstrations[:shot]
